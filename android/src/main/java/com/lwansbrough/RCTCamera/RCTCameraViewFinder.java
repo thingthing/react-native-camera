@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.util.Base64;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.os.AsyncTask;
@@ -323,16 +324,17 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
             }
 
             try {
-                PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(imageData, width, height, 0, 0, width, height, false);
-                BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 
+                //PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(imageData, width, height, 0, 0, width, height, false);
+                //Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                ReactContext reactContext = RCTCameraModule.getReactContextSingleton();
                 WritableMap event = Arguments.createMap();
-                event.putString("data", bitmap);
+
+                event.putString("data", Base64.encodeToString(imageData, Base64.DEFAULT));
                 reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraDataReadAndroid", event);
 
                 // Result result = _multiFormatReader.decodeWithState(bitmap);
                 //
-                // ReactContext reactContext = RCTCameraModule.getReactContextSingleton();
                 // WritableMap event = Arguments.createMap();
                 // event.putString("data", result.getText());
                 // event.putString("type", result.getBarcodeFormat().toString());
