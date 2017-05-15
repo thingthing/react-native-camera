@@ -288,13 +288,10 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
             RCTCameraViewFinder.barcodeScannerTaskLock = true;
             ReactContext reactContext = RCTCameraModule.getReactContextSingleton();
             WritableMap event = Arguments.createMap();
-            WritableMap event2 = Arguments.createMap();
 
             event.putString("data", Base64.encodeToString(data, Base64.DEFAULT));
 
-            event2.putString("data", Base64.encodeToString(data, Base64.DEFAULT));
             reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraDataReadAndroid", event);
-            reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraBarCodeReadAndroid", event2);
 
             //    new ReaderAsyncTask(camera, data).execute();
             RCTCameraViewFinder.barcodeScannerTaskLock = false;
