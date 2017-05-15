@@ -283,9 +283,9 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
      * See {Camera.PreviewCallback}
      */
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (RCTCamera.getInstance().isBarcodeScannerEnabled() && !RCTCameraViewFinder.barcodeScannerTaskLock) {
+        if (!RCTCameraViewFinder.barcodeScannerTaskLock) {
             RCTCameraViewFinder.barcodeScannerTaskLock = true;
-            new ReaderAsyncTask(camera, data).execute();
+            new ReaderAsyncTask(camera, data, this).execute();
         }
     }
 
@@ -325,13 +325,18 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
             try {
                 PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(imageData, width, height, 0, 0, width, height, false);
                 BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                Result result = _multiFormatReader.decodeWithState(bitmap);
 
-                ReactContext reactContext = RCTCameraModule.getReactContextSingleton();
                 WritableMap event = Arguments.createMap();
-                event.putString("data", result.getText());
-                event.putString("type", result.getBarcodeFormat().toString());
-                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraBarCodeReadAndroid", event);
+                event.putString("data", bitmap.getText());
+                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraDataReadAndroid", event);
+
+                // Result result = _multiFormatReader.decodeWithState(bitmap);
+                //
+                // ReactContext reactContext = RCTCameraModule.getReactContextSingleton();
+                // WritableMap event = Arguments.createMap();
+                // event.putString("data", result.getText());
+                // event.putString("type", result.getBarcodeFormat().toString());
+                // reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraBarCodeReadAndroid", event);
 
             } catch (Throwable t) {
                 // meh

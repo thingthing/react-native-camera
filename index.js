@@ -41,7 +41,7 @@ function convertNativeProps(props) {
   if (typeof props.captureMode === 'string') {
     newProps.captureMode = Camera.constants.CaptureMode[props.captureMode];
   }
-  
+
   if (typeof props.captureTarget === 'string') {
     newProps.captureTarget = Camera.constants.CaptureTarget[props.captureTarget];
   }
@@ -150,6 +150,7 @@ export default class Camera extends Component {
 
   async componentWillMount() {
     this._addOnBarCodeReadListener()
+    this._addOnDataRecievedListener();
 
     let { captureMode } = convertNativeProps({ captureMode: this.props.captureMode })
     let hasVideoAndAudio = this.props.captureAudio && captureMode === Camera.constants.CaptureMode.video
@@ -170,9 +171,12 @@ export default class Camera extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    const { onBarCodeRead } = this.props
+    const { onBarCodeRead, onDataRecieved } = this.props
     if (onBarCodeRead !== newProps.onBarCodeRead) {
       this._addOnBarCodeReadListener(newProps)
+    }
+    if (onDataRecieved !== newProps.onDataRecieved) {
+      this._addOnDataRecievedListener(newProps)
     }
   }
 
@@ -193,6 +197,23 @@ export default class Camera extends Component {
     }
   }
 
+  _addOnDataRecievedListener(props) {
+    const { onDataRecieved } = props || this.props
+    this._removeOnDataRecievedListener()
+    if (onDataRecieved) {
+      this.cameraDataRecievedListener = Platform.select({
+        // ios: NativeAppEventEmitter.addListener('CameraBarCodeRead', this._onBarCodeRead),
+        android: DeviceEventEmitter.addListener('CameraDataReadAndroid',  this._onDataRecieved)
+      })
+    }
+  }
+  _removeOnDataRecievedListener() {
+    const listener = this.cameraDataRecievedListener
+    if (listener) {
+      listener.remove()
+    }
+  }
+
   render() {
     const style = [styles.base, this.props.style];
     const nativeProps = convertNativeProps(this.props);
@@ -203,6 +224,12 @@ export default class Camera extends Component {
   _onBarCodeRead = (data) => {
     if (this.props.onBarCodeRead) {
       this.props.onBarCodeRead(data)
+    }
+  };
+
+  _onDataRecieved = (data) => {
+    if (this.props.onDataRecieved) {
+      this.props.onDataRecieved(data);
     }
   };
 
