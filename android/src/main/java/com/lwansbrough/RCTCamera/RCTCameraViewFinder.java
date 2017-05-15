@@ -327,7 +327,7 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
                 BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 
                 WritableMap event = Arguments.createMap();
-                event.putString("data", bitmap.getText());
+                event.putString("data", bitmap);
                 reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraDataReadAndroid", event);
 
                 // Result result = _multiFormatReader.decodeWithState(bitmap);
