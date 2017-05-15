@@ -286,7 +286,7 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
     public void onPreviewFrame(byte[] data, Camera camera) {
         if (!RCTCameraViewFinder.barcodeScannerTaskLock) {
             RCTCameraViewFinder.barcodeScannerTaskLock = true;
-            new ReaderAsyncTask(camera, data, this).execute();
+            new ReaderAsyncTask(camera, data).execute();
         }
     }
 
